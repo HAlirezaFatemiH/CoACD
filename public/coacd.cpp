@@ -1,6 +1,8 @@
 #include "coacd.h"
 #include "../src/logger.h"
+#if WITH_3RD_PARTY_LIBS
 #include "../src/preprocess.h"
+#endif
 #include "../src/process.h"
 
 namespace coacd {
@@ -76,6 +78,7 @@ std::vector<Mesh> CoACD(Mesh const &input, double threshold,
   array<array<double, 3>, 3> rot{
       {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}};
 
+#if WITH_3RD_PARTY_LIBS
   if (params.preprocess_mode == std::string("auto")) {
     bool is_manifold = IsManifold(m);
     logger::info("Mesh Manifoldness: {}", is_manifold);
@@ -84,6 +87,18 @@ std::vector<Mesh> CoACD(Mesh const &input, double threshold,
   } else if (params.preprocess_mode == std::string("on")) {
     ManifoldPreprocess(params, m);
   }
+#else
+  if (params.preprocess_mode == std::string("auto") ||
+      params.preprocess_mode == std::string("on")) {
+    bool is_manifold = IsManifold(m);
+    logger::info("Mesh Manifoldness: {}", is_manifold);
+    if (!is_manifold) {
+      throw std::runtime_error(
+          "Mesh is not a 2-manifold. Recompile with WITH_3RD_PARTY_LIBS=ON to "
+          "enable manifold preprocessing.");
+    }
+  }
+#endif
 
   if (pca) {
     rot = m.PCA();
@@ -100,6 +115,7 @@ std::vector<Mesh> CoACD(Mesh const &input, double threshold,
 }
 
 void set_log_level(std::string_view level) {
+#ifndef DISABLE_SPDLOG
   if (level == "off") {
     logger::get()->set_level(spdlog::level::off);
   } else if (level == "debug") {
@@ -115,6 +131,9 @@ void set_log_level(std::string_view level) {
   } else {
     throw std::runtime_error("invalid log level " + std::string(level));
   }
+#else
+  (void)level; // no-op: spdlog is disabled
+#endif
 }
 
 } // namespace coacd
