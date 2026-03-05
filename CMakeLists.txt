@@ -115,6 +115,8 @@ endif()
 # Install target
 # ##############################################################################
 
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+
 install(
   TARGETS _coacd
   EXPORT CoACDTargets
@@ -147,3 +149,5 @@ configure_package_config_file(
 
 install(FILES "${CMAKE_BINARY_DIR}/CoACDConfig.cmake"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CoACD)
+
+endif()
