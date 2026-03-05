@@ -142,7 +142,7 @@ include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
   ${CMAKE_SOURCE_DIR}/cmake/Config.cmake.in
-  "${CMAKE_BINARY_DIR}/CoACDConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/CoACDConfig.cmake"
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CoACD)
 
 install(FILES "${CMAKE_BINARY_DIR}/CoACDConfig.cmake"
